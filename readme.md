@@ -20,7 +20,7 @@ The demo in [src/demo](src/demo) uses every component, so it's the best place to
 
    ```json
    "dependencies": {
-     "console-ui": "github:carlos-ivan-hernandez/console-ui#v0.2.0"
+     "console-ui": "github:carlos-ivan-hernandez/console-ui#v0.1.0"
    }
    ```
 
