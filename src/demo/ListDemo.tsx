@@ -102,14 +102,21 @@ const HELP: HelpGroup[] = [
     keys: [
       ['za  zM zR', 'fold section / fold all / unfold all'],
       ['/', 'filter'],
-      [':', 'commands: :add, :rename, :clear'],
+      [':', 'commands: :add, :rename, :clear, :theme <name>'],
       ['gt', 'next tab'],
     ],
   },
 ];
 
 /** A small todo app showing lists, keys, dialogs, the picker and the bottom line. */
-export const ListDemo = ({active, onNextTab}: {active: boolean; onNextTab: () => void}) => {
+interface ListDemoProps {
+  active: boolean;
+  onNextTab: () => void;
+  themeNames: string[];
+  onTheme: (name: string) => boolean;
+}
+
+export const ListDemo = ({active, onNextTab, themeNames, onTheme}: ListDemoProps) => {
   const [items, setItems] = useState(SEED);
   const [mode, setMode] = useState<Mode>({kind: 'normal'});
   const [message, setMessage] = useState<Message | null>(null);
@@ -231,6 +238,9 @@ export const ListDemo = ({active, onNextTab}: {active: boolean; onNextTab: () =>
       const done = items.filter(it => it.done).map(it => it.id);
       if (done.length) confirmDelete(done);
       else info('nothing checked');
+    } else if (cmd === 'theme') {
+      if (onTheme(arg)) info(`theme: ${arg}`);
+      else setMessage({text: `usage: :theme ${themeNames.join('|')}`, kind: 'error'});
     } else if (cmd === 'help') {
       setMode({kind: 'help'});
     } else if (cmd) {

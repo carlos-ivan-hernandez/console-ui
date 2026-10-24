@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "description": "Terminal-style, keyboard-first React components with the vera-console look.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/carlos-ivan-hernandez/console-ui.git"
+  },
   "files": [
     "dist"
   ],
@@ -29,6 +33,7 @@
     "fix": "oxlint --fix && oxfmt write .",
     "lint": "oxlint",
     "preview": "vite preview",
+    "release": "node scripts/release.mjs",
     "typecheck": "tsc -b"
   },
   "dependencies": {},

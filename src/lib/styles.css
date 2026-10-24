@@ -1,26 +1,47 @@
 /*
  * console-ui: the vera-console look.
- * Override any token on :root (or on a wrapper) to retheme.
+ *
+ * Theming: set the base colors (--bg, --fg, --accent, and optionally --blue,
+ * --purple, --warn, --error) on :root, or use applyTheme() from JS. The other
+ * colors are mixed from those, so a theme can be as small as two or three
+ * colors. Any derived color can still be set directly to override it.
+ *
+ * To theme part of a page, put the variables on an element with the
+ * `console-theme` class so the derived colors are recomputed there.
  */
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
 
 :root {
+  /* Base colors. */
   --bg: #0d0f12;
-  --bg-bar: #161a20;
-  --bg-cursor: #1f2731;
-  --bg-selection: #2d4a3e;
-  --bg-search-match: #4d3f12;
   --fg: #c9d1d9;
-  --dim: #6b7380;
-  --border: #2a313b;
-  --border-active: #3f6f5f;
   --accent: #7ee787;
   --blue: #79c0ff;
   --purple: #d2a8ff;
   --warn: #e3b341;
   --error: #ff7b72;
   --font: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+}
 
+/* Derived colors, recomputed wherever the base colors change. */
+:root,
+.console-theme {
+  --bg-bar: color-mix(in srgb, var(--fg) 6%, var(--bg));
+  --bg-cursor: color-mix(in srgb, var(--fg) 13%, var(--bg));
+  --bg-selection: color-mix(in srgb, var(--accent) 29%, var(--bg));
+  --bg-search-match: color-mix(in srgb, var(--warn) 29%, var(--bg));
+  --dim: color-mix(in srgb, var(--fg) 52%, var(--bg));
+  --border: color-mix(in srgb, var(--fg) 18%, var(--bg));
+  --border-active: color-mix(in srgb, var(--accent) 48%, var(--bg));
+  --backdrop: rgb(0 0 0 / 0.6);
+}
+
+.console-theme {
+  background: var(--bg);
+  color: var(--fg);
+}
+
+:root {
   color-scheme: dark;
   background: var(--bg);
   color: var(--fg);
@@ -411,7 +432,7 @@ button {
   display: grid;
   place-items: center;
   padding: 1rem;
-  background: rgb(0 0 0 / 0.6);
+  background: var(--backdrop);
 }
 .overlay > *,
 .overlay > * > .box {

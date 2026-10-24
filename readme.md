@@ -6,8 +6,9 @@ Everything is plain DOM in a monospace grid, so the mouse, scrolling, text input
 
 ```sh
 pnpm install
-pnpm dev     # demo app at http://localhost:1778 (any login works)
-pnpm build   # builds the library into dist/
+pnpm dev                # demo app at http://localhost:1778 (any login works)
+pnpm build              # builds the library into dist/
+pnpm release 0.3.0      # publishes v0.3.0 to GitHub (see Releasing)
 ```
 
 The demo in [src/demo](src/demo) uses every component, so it's the best place to start reading.
@@ -15,15 +16,15 @@ The demo in [src/demo](src/demo) uses every component, so it's the best place to
 ## Use it in a new app
 
 1. Create a React app (`pnpm create vite my-app --template react-ts`).
-2. Build console-ui once (`pnpm build` here), then add it to the app's `package.json` and run `pnpm install`:
+2. Add console-ui to the app's `package.json` from GitHub, pinned to a release tag, and run `pnpm install`:
 
    ```json
    "dependencies": {
-     "console-ui": "file:../console-ui"
+     "console-ui": "github:carlos-ivan-hernandez/console-ui#v0.2.0"
    }
    ```
 
-   After changing console-ui, run `pnpm build` here and `pnpm install` in the app again.
+   This works anywhere, including Vercel, with nothing to build. To move to a newer release, change the tag and run `pnpm install`.
 
 3. Import the stylesheet once, in `main.tsx`:
 
@@ -180,21 +181,57 @@ It ignores keys typed in inputs, inside `.overlay` dialogs, and with ⌘/Ctrl/Al
 
 ## Theme
 
-All colors are CSS variables on `:root`; override any of them after importing the stylesheet:
+Every color is a CSS variable, and most of them are mixed from a few base colors. A whole theme can be as small as a background, a text color and an accent.
+
+From JS, call `applyTheme` once at startup (it also updates `<meta name="theme-color">`), or `useTheme` inside a component:
+
+```ts
+import {applyTheme, themes} from 'console-ui';
+
+applyTheme({bg: '#1c1c1c'}); // keep the default colors, change the background
+applyTheme(themes.gruvbox); // or a ready-made theme
+applyTheme({...themes.nord, accent: '#a3be8c'}); // or a variation
+```
+
+Ready-made themes: `console` (the default), `gruvbox`, `nord`, `dracula`, `solarized`, `amber` and `paper` (light). The demo cycles through them with the `[theme]` button in the top bar, or `:theme <name>`.
+
+Or in CSS, after importing the stylesheet:
 
 ```css
 :root {
+  --bg: #1c1c1c;
   --accent: #ffa657;
-  --border-active: #6e4b2a;
 }
 ```
 
-| Variable                                              | Used for                                                    |
-| ----------------------------------------------------- | ----------------------------------------------------------- |
-| `--bg`, `--bg-bar`, `--bg-cursor`, `--bg-selection`   | Page, top/status bars, cursor line, text selection          |
-| `--fg`, `--dim`                                       | Text, secondary text                                        |
-| `--border`, `--border-active`                         | Box borders                                                 |
-| `--accent`, `--blue`, `--purple`, `--warn`, `--error` | Active things, section titles, selection, dates, errors     |
-| `--font`                                              | JetBrains Mono (loaded from Google Fonts by the stylesheet) |
+To theme only part of a page, give an element the `console-theme` class and the variables, e.g. `<div className='console-theme' style={themeStyle(themes.paper)}>`.
+
+| Variable (`Theme` key)                                               | Used for                                                    | Default                  |
+| -------------------------------------------------------------------- | ----------------------------------------------------------- | ------------------------ |
+| `--bg` (`bg`), `--fg` (`fg`)                                         | Page background, text                                       | base                     |
+| `--accent` (`accent`)                                                | Cursor, active borders, NORMAL badge, login banner          | base                     |
+| `--blue`, `--purple`, `--warn`, `--error`                            | Section titles, selection, dates/prompts, errors            | base                     |
+| `--bg-bar` (`bgBar`), `--bg-cursor` (`bgCursor`)                     | Top and status bars, the cursor line                        | `fg` mixed into `bg`     |
+| `--dim` (`dim`), `--border` (`border`)                               | Secondary text, box borders                                 | `fg` mixed into `bg`     |
+| `--border-active` (`borderActive`), `--bg-selection` (`bgSelection`) | Focused box border, selected text                           | `accent` mixed into `bg` |
+| `--bg-search-match` (`bgSearchMatch`)                                | Search matches in the editor                                | `warn` mixed into `bg`   |
+| `--backdrop` (`backdrop`)                                            | Behind dialogs                                              | `rgb(0 0 0 / 0.6)`       |
+| `--font` (`font`)                                                    | JetBrains Mono (loaded from Google Fonts by the stylesheet) |                          |
+
+Set a mixed color directly to override it. For a light theme pass `scheme: 'light'` so scrollbars and form controls match.
 
 Helper classes: `dim`, `accent`, `blue`, `purple`, `warn`, `error`, `bold`, `grow` (fills a flex row), `hide-narrow` (hidden under 600px), `boot` (a padded loading line), `pane-scroll` (a scrolling area inside a `Box`), `status-path`.
+
+## Releasing
+
+Apps install console-ui from GitHub tags, so changes reach them through a release:
+
+```sh
+pnpm release 0.3.0
+```
+
+The working tree must be clean. The script sets the version in `package.json` and commits it, builds the library, commits the build to the `release` branch, tags it `v0.3.0`, and pushes master, `release` and the tag. The `release` branch only ever holds built files (`dist`, `package.json`, this readme); the source stays on master.
+
+Then bump the tag in each app (`"console-ui": "github:carlos-ivan-hernandez/console-ui#v0.3.0"`) and run `pnpm install` there.
+
+To try unreleased console-ui changes in an app locally, link it instead (`pnpm link ../console-ui` in the app, after `pnpm build` here), and run `pnpm install` in the app to go back to the release before committing.

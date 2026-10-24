@@ -28,6 +28,16 @@ export {
   useScrollIntoView,
 } from './List';
 export {LoginScreen, type LoginScreenProps} from './LoginScreen';
+export {
+  applyTheme,
+  type Theme,
+  type ThemeInput,
+  type ThemeName,
+  themes,
+  themeStyle,
+  themeVariables,
+  useTheme,
+} from './theme';
 export {DEFAULT_HEADING_COLORS, type HeadingColors, MarkdownPreview} from './markdown';
 export {
   Dialog,
